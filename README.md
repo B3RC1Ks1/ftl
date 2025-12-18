@@ -95,6 +95,7 @@ Wymaga OpenSSL (`libcrypto`).
 
 ```bash
 make
+```
 
 ## Przykładowy scenariusz demo
 1) Fresh init:
