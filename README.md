@@ -93,6 +93,9 @@ Duplikaty `id` są blokowane: `snap_create` zwraca błąd, jeśli snapshot o dan
 Program został przetestowany na WSL.
 Wymaga OpenSSL (`libcrypto`).
 
+```bash
+make
+
 ## Przykładowy scenariusz demo
 1) Fresh init:
 - `./ftl_demo flash.bin snap.db fresh`
