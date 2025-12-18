@@ -1,0 +1,23 @@
+# build artifacts
+*.o
+ftl_demo
+*.a
+*.so
+*.out
+
+# binaries / images / generated
+*.bin
+*.img
+*.elf
+
+# local DB / snapshots / temp
+snap.db
+*.db
+*.tmp
+*.log
+
+# editor/OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
