@@ -28,6 +28,7 @@ static void usage(const char *argv0)
     printf("  %s <flash.bin> <snap.db> read   <lba> <nblocks>\n", argv0);
     printf("  %s <flash.bin> <snap.db> snap_create  <id>\n", argv0);
     printf("  %s <flash.bin> <snap.db> snap_restore <id>\n", argv0);
+    printf("  %s <flash.bin> <snap.db> snap_restore_read <id> <lba> <nblocks>\n", argv0);
     printf("  %s <flash.bin> <snap.db> snap_list\n", argv0);
     printf("  %s <flash.bin> <snap.db> map\n", argv0);
     printf("  %s <flash.bin> <snap.db> stress <iters>   (wymusza reuse stron)\n", argv0);
@@ -176,6 +177,47 @@ int main(int argc, char **argv)
             fprintf(stderr, "snap_restore: %s\n", strerror(-rc));
         else
             printf("snap_restore OK\n");
+    }
+    else if (strcmp(cmd, "snap_restore_read") == 0)
+    {
+        if (argc != 7)
+        {
+            usage(argv[0]);
+            rc = -EINVAL;
+            goto out;
+        }
+
+        const char *sid = argv[4];
+        uint32_t lba = (uint32_t)strtoul(argv[5], NULL, 0);
+        uint32_t n = (uint32_t)strtoul(argv[6], NULL, 0);
+
+        rc = snapshot_restore(db, ftl, sid);
+        if (rc != 0)
+        {
+            fprintf(stderr, "snap_restore: %s\n", strerror(-rc));
+            goto out;
+        }
+        printf("snap_restore OK\n");
+
+        unsigned char *buf = (unsigned char *)malloc((size_t)n * LBA_SIZE);
+        if (!buf)
+        {
+            rc = -ENOMEM;
+            goto out;
+        }
+
+        rc = ftl_read(ftl, lba, buf, n);
+        for (uint32_t i = 0; i < n; i++)
+        {
+            unsigned char *blk = buf + (size_t)i * LBA_SIZE;
+            printf("LBA %u: ", lba + i);
+            hexdump16(blk, LBA_SIZE);
+            printf("\n");
+        }
+        if (rc != 0)
+            fprintf(stderr, "read: partial/missing data (%s)\n", strerror(-rc));
+
+        free(buf);
     }
     else if (strcmp(cmd, "snap_list") == 0)
     {
